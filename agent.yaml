@@ -1,0 +1,26 @@
+spec_version: "0.1.0"
+name: framework-translator-agent
+version: 2.0.0
+description: >
+  Translates AI agent code between 8 major frameworks: LangGraph, CrewAI, OpenAI Agents SDK,
+  AutoGen, Semantic Kernel, Haystack, Agno/Phidata, and Google ADK. Analyzes source agent structure,
+  produces a canonical intermediate representation, generates idiomatic target framework code,
+  and validates translation fidelity with web search for unknown APIs.
+
+model:
+  preferred: claude-opus-4-6
+  fallback:
+    - claude-sonnet-4-6
+  constraints:
+    temperature: 0.2
+    max_tokens: 8192
+    top_p: 0.9
+
+skills:
+  - analyze
+  - translate
+  - validate
+
+runtime:
+  max_turns: 50
+  timeout: 300
