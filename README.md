@@ -5,7 +5,7 @@ Translates AI agent code between 8 major frameworks with exact 1:1 mapping: Lang
 ## Run
 
 ```bash
-npx @open-gitagent/gitagent run -r https://github.com/<username>/framework-translator-agent
+npx @open-gitagent/gitagent run -r https://github.com/shreyas-lyzr/framework-translator-agent
 ```
 
 ## What It Can Do
