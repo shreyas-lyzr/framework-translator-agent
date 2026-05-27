@@ -1,6 +1,6 @@
 ---
 name: translate
-description: "Translate AI agent code from one framework to another. Generates idiomatic target framework code from a Canonical Intermediate Representation (CIR). Supports 8 frameworks: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, and Google ADK. Use when the user wants to convert, port, migrate, rewrite, or translate agent code between any of these frameworks. Triggers on: translate, convert, port, migrate, rewrite, translate to langgraph, convert to crewai, port to openai, migrate to autogen, rewrite in haystack, convert to google adk, change framework."
+description: "Translate AI agent code from one framework to another. Generates idiomatic target framework code from a Canonical Intermediate Representation (CIR). Supports 9 frameworks: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, Google ADK, and Lyzr ADK. Use when the user wants to convert, port, migrate, rewrite, or translate agent code between any of these frameworks. Triggers on: translate, convert, port, migrate, rewrite, translate to langgraph, convert to crewai, port to openai, migrate to autogen, rewrite in haystack, convert to google adk, convert to lyzr adk, change framework."
 allowed-tools: "Read, Write, Edit, Bash, Grep, Glob, WebSearch, Agent"
 metadata:
   version: "1.0.0"
@@ -36,6 +36,7 @@ Read the corresponding codegen reference for the target framework:
 - `references/haystack-codegen.md`
 - `references/agno-codegen.md`
 - `references/google-adk-codegen.md`
+- `references/lyzr-adk-codegen.md`
 
 Load **only** the target framework's reference file.
 

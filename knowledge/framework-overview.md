@@ -15,6 +15,7 @@ Use these signals to auto-detect the source framework:
 | **Agno** | `from agno.agent import Agent` | `from agno.models.*`, `from agno.tools.*`, `Team`, `Workflow`, `Storage` | `*.py` with `agent.run()` |
 | **Phidata** (legacy Agno) | `from phi.agent import Agent` | `from phi.model.*`, `from phi.tools.*`, `Playground` | `*.py` with `agent.print_response()` |
 | **Google ADK** | `from google.adk.agents import Agent` | `SequentialAgent`, `ParallelAgent`, `LoopAgent`, `Runner`, `sub_agents=`, `model="gemini-"` | `*.py` with `Runner(agent=...)` |
+| **Lyzr ADK** | `from lyzr import Studio` | `Studio()`, `create_agent(role=, goal=, instructions=)`, `add_tool(`, `agent.run(...).response`, `knowledge_bases=`, `session_id=`, `provider="openai/gpt-4o"` | `lyzr-adk` in deps |
 
 ## Framework Paradigm Summary
 
@@ -28,6 +29,7 @@ Use these signals to auto-detect the source framework:
 | **Haystack** | Pipeline-based (components + connections) | Medium | Pipeline branching | RAG and document processing |
 | **Agno** | Declarative (agent + tools + team) | Low | Teams and workflows | Quick agent setup, model-agnostic |
 | **Google ADK** | Agent-based (LLM + workflow agents) | Medium | sub_agents with LLM delegation | Google-native agents, multi-agent orchestration |
+| **Lyzr ADK** | Declarative (studio + agent + tools) | Low | Multiple agents on one studio | Quick agents with built-in RAG, memory & guardrails |
 
 ## Key Structural Differences
 
@@ -38,6 +40,7 @@ Use these signals to auto-detect the source framework:
 - **AutoGen**: Agents are objects with `system_message` and registered functions. Chat-oriented.
 - **Semantic Kernel**: No explicit "agent" — a Kernel with plugins provides capabilities. Agent Framework layer adds multi-agent.
 - **Haystack**: No "agent" — components in a pipeline. Each component has `run()` method with typed I/O.
+- **Lyzr ADK**: Agents are objects created via `studio.create_agent(role, goal, instructions)`. Tools are plain functions added with `add_tool()` (no decorator). RAG (`knowledge_bases`), memory (`session_id`), and guardrails (RAI) are built in. Replies read from `response.response`.
 - **Agno**: Agent objects with `model`, `instructions`, `tools`. Most similar to OpenAI SDK structure.
 - **Google ADK**: `Agent`/`LlmAgent` with `model`, `instruction`, `tools`, `sub_agents`. Workflow agents (`SequentialAgent`, `ParallelAgent`, `LoopAgent`) for deterministic orchestration without LLMs.
 

@@ -1,6 +1,6 @@
 ---
 name: analyze
-description: "Analyze and decompose AI agent source code into a Canonical Intermediate Representation (CIR). Detects the source framework automatically and extracts agents, tools, state, orchestration, and memory. Supports 8 frameworks: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, and Google ADK. Use when the user wants to understand an agent's structure, when beginning a framework translation, or when the user says 'analyze this agent', 'what does this agent do', 'break down this code', 'show me the architecture', 'decompose this agent', or provides agent code to translate. Triggers on: analyze, understand, decompose, architecture, break down, what does this do, translate (as first step)."
+description: "Analyze and decompose AI agent source code into a Canonical Intermediate Representation (CIR). Detects the source framework automatically and extracts agents, tools, state, orchestration, and memory. Supports 9 frameworks: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, Google ADK, and Lyzr ADK. Use when the user wants to understand an agent's structure, when beginning a framework translation, or when the user says 'analyze this agent', 'what does this agent do', 'break down this code', 'show me the architecture', 'decompose this agent', or provides agent code to translate. Triggers on: analyze, understand, decompose, architecture, break down, what does this do, translate (as first step)."
 allowed-tools: "Read, Grep, Glob, Bash, WebSearch, Agent"
 metadata:
   version: "1.0.0"
@@ -9,7 +9,7 @@ metadata:
 
 # Analyze Agent Source Code
 
-Read agent source code written in any of the 8 supported frameworks and produce a Canonical Intermediate Representation (CIR).
+Read agent source code written in any of the 9 supported frameworks and produce a Canonical Intermediate Representation (CIR).
 
 ## Step 1: Detect the Source Framework
 
@@ -40,6 +40,7 @@ Read the corresponding reference file for the detected framework:
 - `references/haystack-patterns.md`
 - `references/agno-patterns.md`
 - `references/google-adk-patterns.md`
+- `references/lyzr-adk-patterns.md`
 
 Load **only** the detected framework's reference file.
 

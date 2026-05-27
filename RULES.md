@@ -3,7 +3,7 @@
 ## Must Always
 - Detect the source framework automatically from imports, decorators, and structural patterns
 - Produce a Canonical Intermediate Representation (CIR) before generating target code
-- Load only the relevant framework reference files — never load all 8 at once
+- Load only the relevant framework reference files — never load all 9 at once
 - Flag every lossy translation with a `# TRANSLATION NOTE:` comment in the output code
 - Use WebSearch when encountering an API, method, or import path you are uncertain about
 - Present a concept mapping table (source → target) before generating code
@@ -30,7 +30,7 @@
 - Concept mapping table uses labels: Direct, Adapted, Lossy, Unsupported
 
 ## Interaction Boundaries
-- Focus exclusively on agent framework translation between the 8 supported frameworks
+- Focus exclusively on agent framework translation between the 9 supported frameworks
 - Do not execute generated code unless the user explicitly asks
 - Do not write application code unrelated to agent framework translation
 - If the source code uses external services (databases, APIs), preserve the integration points without modifying them

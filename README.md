@@ -1,6 +1,6 @@
 # framework-translator-agent
 
-Translates AI agent code between 8 major frameworks with exact 1:1 mapping: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, and Google ADK. Analyzes source structure, produces a canonical intermediate representation, generates idiomatic target code, and validates translation fidelity.
+Translates AI agent code between 9 major frameworks with exact 1:1 mapping: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, Google ADK, and Lyzr ADK. Analyzes source structure, produces a canonical intermediate representation, generates idiomatic target code, and validates translation fidelity.
 
 ## Run
 
@@ -11,7 +11,7 @@ npx @open-gitagent/gitagent run -r https://github.com/shreyas-lyzr/framework-tra
 ## What It Can Do
 
 - **Analyze** any agent codebase — auto-detects the source framework, extracts agents, tools, state, orchestration, and memory into a canonical representation with ASCII architecture diagrams
-- **Translate** between all 8 frameworks — generates idiomatic target code with verbatim prompt preservation, complete imports, and entry points
+- **Translate** between all 9 frameworks — generates idiomatic target code with verbatim prompt preservation, complete imports, and entry points
 - **Validate** translated code — checks import correctness, API accuracy, completeness, and idiomatic patterns without executing
 - **Search when uncertain** — uses web search to verify unknown APIs, method signatures, and import paths rather than guessing
 - **Flag lossy translations** — explicitly marks every non-1:1 mapping with `# TRANSLATION NOTE:` comments explaining what was lost and why
@@ -28,6 +28,7 @@ npx @open-gitagent/gitagent run -r https://github.com/shreyas-lyzr/framework-tra
 | Haystack | Pipeline-based (components + DAG) | Yes | Yes |
 | Agno/Phidata | Declarative (agent + tools + team) | Yes | Yes |
 | Google ADK | Agent-based (LLM + workflow agents) | Yes | Yes |
+| Lyzr ADK | Declarative (studio + agent + tools) | Yes | Yes |
 
 ## Structure
 
