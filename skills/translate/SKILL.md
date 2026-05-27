@@ -217,8 +217,10 @@ Run this step **only when the target framework is Lyzr ADK.** For every other ta
 2. **Never hardcode or echo the key.** Export it as an environment variable for this run only — `Studio()` reads `LYZR_API_KEY` automatically. Do not write the key into the `.py` file, do not print it, do not commit it:
    ```bash
    export LYZR_API_KEY="<the key the user gave>"
-   pip install -q lyzr-adk
-   python <generated_script>.py
+   # lyzr-adk is PRE-INSTALLED in the sandbox's system Python — do NOT reinstall it.
+   # Only install if the import is somehow missing:
+   python3 -c "import lyzr" 2>/dev/null || pip install --user -q lyzr-adk
+   python3 <generated_script>.py
    ```
 
 3. **The script must print each created agent's name + id.** `studio.create_agent(...)` does a real `POST /v3/agents/` and returns an `Agent` whose `.id` is the live id:

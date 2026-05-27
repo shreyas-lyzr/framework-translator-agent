@@ -138,8 +138,10 @@ complete once the generated code has been run against the user's account.
    picks it up from the environment:
    ```bash
    export LYZR_API_KEY="<key the user pasted>"
-   pip install -q lyzr-adk
-   python create_agents.py
+   # lyzr-adk is PRE-INSTALLED in the sandbox's system Python — do NOT reinstall it
+   # (it's at /usr/local/lib/python3*/dist-packages). Install only if import fails:
+   python3 -c "import lyzr" 2>/dev/null || pip install --user -q lyzr-adk
+   python3 create_agents.py
    ```
 3. **Make the script print each created agent's name + id** so the user can find them:
    ```python
