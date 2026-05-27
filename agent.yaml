@@ -22,5 +22,5 @@ skills:
   - validate
 
 runtime:
-  max_turns: 4000
+  max_turns: 300
   timeout: 14400
