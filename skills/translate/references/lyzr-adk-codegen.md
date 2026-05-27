@@ -18,10 +18,15 @@ from lyzr import Studio          # the only import you usually need
 
 ## 2. Minimal Agent
 
+`Studio()` authenticates with a Lyzr API key: pass `Studio(api_key="sk-...")` or set
+the `LYZR_API_KEY` environment variable (Studio reads it automatically). A missing or
+invalid key raises `AuthenticationError`. **Never** hardcode the key into the generated
+file — rely on the env var (see §10).
+
 ```python
 from lyzr import Studio
 
-studio = Studio()
+studio = Studio()                    # reads LYZR_API_KEY from env (do NOT inline the key)
 agent = studio.create_agent(
     name="<agent name>",
     provider="openai/gpt-4o",        # "<provider>/<model>"; map from CIR model
@@ -109,3 +114,47 @@ report = writer.run(f"Write a report from: {facts}").response
 - [ ] Read replies via `response.response`.
 - [ ] `provider` string composed as `"<provider>/<model>"` from the CIR model.
 - [ ] If a Lyzr ADK feature has no source equivalent, omit it (don't invent); note unknowns and verify the API via web search before emitting.
+- [ ] After generating, **create the agents live** — see §10. A Lyzr ADK translation is not "done" until the agents exist in the user's Lyzr workspace.
+
+## 10. Provisioning — actually create the agents (run the code)
+
+Lyzr ADK is a **hosted platform**, not a local library: `studio.create_agent(...)`
+performs a real `POST /v3/agents/` and registers the agent in the user's Lyzr
+workspace. The returned `Agent` has a live `.id`. So the translation is only
+complete once the generated code has been run against the user's account.
+
+**Ground truth (lyzr-adk 0.1.x):**
+- Auth: `Studio(api_key="sk-...")` **or** `LYZR_API_KEY` env var. Missing/invalid → `AuthenticationError`.
+- `studio.create_agent(name, provider, role, goal, instructions, ...)` → `POST /v3/agents/` → `Agent` with `.id` (the live agent id).
+- `agent.add_tool(fn)` attaches a local tool (bare callable works; `@tool` from `from lyzr import tool` optional).
+- `agent.run(msg, session_id=..., response_model=...).response` → the text reply (use for a smoke-test turn).
+
+**Procedure (do this after Step 6 of the translate skill):**
+
+1. **Ask the user for their Lyzr API key — always.** Do not create anything without
+   it. Tell them where to find it (`https://studio.lyzr.ai` → Settings → API Keys) and
+   let them decline with "skip" to keep code-only.
+2. **Never hardcode/echo/commit the key.** Export it for this run only; `Studio()`
+   picks it up from the environment:
+   ```bash
+   export LYZR_API_KEY="<key the user pasted>"
+   pip install -q lyzr-adk
+   python create_agents.py
+   ```
+3. **Make the script print each created agent's name + id** so the user can find them:
+   ```python
+   import os
+   from lyzr import Studio
+
+   studio = Studio()  # reads LYZR_API_KEY from env
+   agent = studio.create_agent(
+       name="Support Bot", provider="openai/gpt-4o",
+       role="...", goal="...", instructions="...",
+   )
+   # agent.add_tool(get_weather)   # one per CIR tool
+   print(f"✅ Created {agent.name}  id={agent.id}")
+   ```
+4. **Run it, capture the printed IDs, and report** that the agents are now live in
+   the user's Lyzr Studio workspace (`https://studio.lyzr.ai`), listing each
+   `name` → `id`. On `AuthenticationError` ask for a fresh key; on `APIError` /
+   `ValidationError` surface the message and the offending field/value.

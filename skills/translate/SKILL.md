@@ -21,7 +21,9 @@ Identify:
 - **Source framework**: from the CIR or the user's input
 - **Target framework**: ask the user if not specified
 
-Supported targets: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno, Google ADK
+Supported targets: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno, Google ADK, Lyzr ADK
+
+> **If the target is Lyzr ADK**, the translation is not finished at code generation. Lyzr ADK is a hosted platform — the agents must actually be *created* in the user's Lyzr workspace by running the generated code. See **Step 7** below; you will need to ask the user for their Lyzr API key.
 
 Confirm: `Translating from **{source}** to **{target}**. Proceed?`
 
@@ -179,6 +181,16 @@ Never guess at APIs — always verify.
 - Entry: `Runner(agent=agent, app_name="app", session_service=InMemorySessionService()).run_async(session_id, user_id, message)`
 - Note: Default models are Gemini; add `# TRANSLATION NOTE:` if source used non-Google models (use `LiteLlm` wrapper)
 
+### Targeting Lyzr ADK
+- One `Studio()` instance; one `studio.create_agent(name, provider, role, goal, instructions, ...)` per CIR agent
+- `Studio()` reads the API key from the `LYZR_API_KEY` env var (or `Studio(api_key=...)`) — **never hardcode the key into the generated file**
+- Tools: plain Python functions added with `agent.add_tool(fn)` (the docstring becomes the description; no decorator needed — an optional `@tool` from `from lyzr import tool` also works)
+- RAG: `knowledge_bases=[...]`; memory: pass `session_id=` to `agent.run(...)`; structured output: `response_model=PydanticModel`
+- `studio.create_agent(...)` performs a real `POST /v3/agents/` — running the code **creates a live agent**. The returned object's `.id` is the live agent id.
+- Entry / read replies: `response = agent.run("..."); print(response.response)`
+- The generated script must `print(...)` each created agent's `name` and `.id` so the user can locate them in Lyzr Studio
+- See **Step 7** — after generating the code you must ask for the API key and actually run it to create the agents
+
 ## Step 6: Output
 
 Write generated code to file(s):
@@ -193,3 +205,36 @@ Present:
 4. Required pip packages: `pip install {packages}`
 5. Required environment variables
 6. Suggested next step: `Run the **validate** skill to verify the translation`
+
+## Step 7: Create the agents live (Lyzr ADK target ONLY)
+
+Run this step **only when the target framework is Lyzr ADK.** For every other target, stop after Step 6 — do not run anything. Lyzr ADK is a hosted platform, so a translation to Lyzr ADK is only complete once the agents have actually been created in the user's Lyzr workspace. Follow `references/lyzr-adk-codegen.md` §10.
+
+1. **Ask for the Lyzr API key — always, every time.** Do not create anything without it:
+   > "To actually create these agents in your Lyzr workspace I need your **Lyzr API key** (from https://studio.lyzr.ai → Settings → API Keys). Paste it here, or say **skip** to keep the generated code only."
+   If the user says skip, stop here and deliver the code as-is.
+
+2. **Never hardcode or echo the key.** Export it as an environment variable for this run only — `Studio()` reads `LYZR_API_KEY` automatically. Do not write the key into the `.py` file, do not print it, do not commit it:
+   ```bash
+   export LYZR_API_KEY="<the key the user gave>"
+   pip install -q lyzr-adk
+   python <generated_script>.py
+   ```
+
+3. **The script must print each created agent's name + id.** `studio.create_agent(...)` does a real `POST /v3/agents/` and returns an `Agent` whose `.id` is the live id:
+   ```python
+   import os
+   from lyzr import Studio
+
+   studio = Studio()  # reads LYZR_API_KEY from env — do NOT pass the key literal
+   agent = studio.create_agent(
+       name="...", provider="openai/gpt-4o",
+       role="...", goal="...", instructions="...",
+   )
+   # agent.add_tool(my_tool)   # for each CIR tool
+   print(f"✅ Created: {agent.name}  id={agent.id}")
+   ```
+
+4. **Run it and report.** Execute the script with Bash, capture the printed agent IDs, and tell the user the agents are now live in their Lyzr Studio workspace (https://studio.lyzr.ai), listing each `name` → `id`. On failure, surface the exact error and ask the user to fix it:
+   - `AuthenticationError` → the key is missing/invalid/expired — ask for a fresh one
+   - `APIError` / `ValidationError` → bad `provider`/model id, quota, or a malformed field — show the message and the offending value

@@ -11,8 +11,10 @@
 - Preserve the original agent's tool definitions, prompts/instructions, and orchestration logic verbatim
 - Validate generated code for import correctness, API accuracy, and completeness
 - Show an ASCII architecture diagram of the source agent during analysis
+- **When the target is Lyzr ADK**: ask the user for their Lyzr API key, then actually run the generated code so `studio.create_agent(...)` creates the agents live in their Lyzr workspace, and report the created agent IDs. Lyzr ADK is a hosted platform — a conversion to it is incomplete until the agents exist. (The user may decline with "skip" to keep code only.)
 
 ## Must Never
+- Hardcode, echo, log, or commit a user's Lyzr API key — read it from the `LYZR_API_KEY` env var for the run only
 - Invent API methods, classes, or decorators that do not exist in the target framework
 - Silently drop tools, prompts, orchestration logic, or state during translation
 - Generate code that mixes idioms from multiple frameworks
@@ -31,7 +33,7 @@
 
 ## Interaction Boundaries
 - Focus exclusively on agent framework translation between the 9 supported frameworks
-- Do not execute generated code unless the user explicitly asks
+- Do not execute generated code unless the user explicitly asks — **exception:** when the target is Lyzr ADK, running the generated code is how the agents get created; the user's act of providing the Lyzr API key is that explicit consent (offer "skip" if they don't want it)
 - Do not write application code unrelated to agent framework translation
 - If the source code uses external services (databases, APIs), preserve the integration points without modifying them
-- If asked about a framework outside the 8 supported, explain the limitation and suggest the closest supported alternative
+- If asked about a framework outside the 9 supported, explain the limitation and suggest the closest supported alternative
