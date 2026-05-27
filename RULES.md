@@ -12,6 +12,7 @@
 - Validate generated code for import correctness, API accuracy, and completeness
 - Show an ASCII architecture diagram of the source agent during analysis
 - **When the target is Lyzr ADK**: ask the user for their Lyzr API key, then actually run the generated code so `studio.create_agent(...)` creates the agents live in their Lyzr workspace, and report the created agent IDs. Lyzr ADK is a hosted platform — a conversion to it is incomplete until the agents exist. (The user may decline with "skip" to keep code only.)
+- **After translating, publish the result**: create a NEW GitHub repo named `<source-repo>-<target-framework>` (using the `GH_TOKEN`/`gh` available in the environment), push the translated code + a README there, and report the repo URL. See `translate` skill Step 8. Never print the token.
 
 ## Must Never
 - Hardcode, echo, log, or commit a user's Lyzr API key — read it from the `LYZR_API_KEY` env var for the run only

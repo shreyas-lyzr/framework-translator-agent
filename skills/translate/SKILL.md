@@ -240,3 +240,20 @@ Run this step **only when the target framework is Lyzr ADK.** For every other ta
 4. **Run it and report.** Execute the script with Bash, capture the printed agent IDs, and tell the user the agents are now live in their Lyzr Studio workspace (https://studio.lyzr.ai), listing each `name` → `id`. On failure, surface the exact error and ask the user to fix it:
    - `AuthenticationError` → the key is missing/invalid/expired — ask for a fresh one
    - `APIError` / `ValidationError` → bad `provider`/model id, quota, or a malformed field — show the message and the offending value
+
+## Step 8: Publish the translated code to a NEW GitHub repo
+
+After the code is generated (and, for a Lyzr ADK target, after Step 7), publish the translation to a **fresh GitHub repo** so the user gets a shareable result. A GitHub token is in the environment (`GH_TOKEN` / `GITHUB_TOKEN`); `gh` and `git` are installed and `gh` reads `GH_TOKEN` automatically. Do this by default; report the URL at the end.
+
+1. **Assemble the output in a clean directory** (NOT the cloned source repo — start empty so the new repo contains only the translation): the generated file(s) + a short `README.md` stating *source framework → target framework*, the original source URL, the `pip install …` line, and how to run.
+2. **Name the repo** `<source-repo-name>-<target-framework>`, lowercased with every non-alphanumeric run collapsed to `-` (e.g. source `write_a_book_with_flows` + target Lyzr ADK ⇒ `write-a-book-with-flows-lyzr-adk`). If the name already exists, append `-2`, `-3`, …
+3. **Create + push** under the token's account (do NOT print the token):
+   ```bash
+   cd <output-dir>
+   git init -q
+   git add -A
+   git -c user.email="agent@lyzr.ai" -c user.name="Framework Translator" commit -q -m "Translate <source> → <target>"
+   gh repo create <name> --public --source . --remote origin --push
+   ```
+   If `gh repo create --push` fails, create the repo first (`gh repo create <name> --public`) then `git push -u origin HEAD:main`.
+4. **Report the repo URL** to the user — `https://github.com/<owner>/<name>` (get `<owner>` from `gh api user -q .login`). Never echo the token. If repo creation fails (bad/again-rate-limited token), surface the `gh` error and tell the user the code is ready locally but the push failed.
