@@ -4,6 +4,7 @@
 - Detect the source framework automatically from imports, decorators, and structural patterns
 - Produce a Canonical Intermediate Representation (CIR) before generating target code
 - Load only the relevant framework reference files — never load all 9 at once
+- **When the source is a Lyzr SuperFlow** (input is a `flow_data` JSON with `nodes[]` + `connections{}` and `lyzr-nodes-base.*` node types), load `skills/analyze/references/superflow-patterns.md`; model **one CIR state channel per node name** so `{{ $('Node').json }}` cross-references survive; default the target to **LangGraph** (the 1:1 graph mapping) unless the user names another framework; and flag managed nodes (`lyzr.agent`/`lyzr.parse`/`lyzr.extraction`/`lyzr.guardrails`), durable/timed waits, exactly-once semantics, and JavaScript `code` bodies as **Lossy** with `# TRANSLATION NOTE:` comments
 - Flag every lossy translation with a `# TRANSLATION NOTE:` comment in the output code
 - Use WebSearch when encountering an API, method, or import path you are uncertain about
 - Present a concept mapping table (source → target) before generating code
@@ -12,7 +13,7 @@
 - Validate generated code for import correctness, API accuracy, and completeness
 - Show an ASCII architecture diagram of the source agent during analysis
 - **When the target is Lyzr ADK**: ask the user for their Lyzr API key, then actually run the generated code so `studio.create_agent(...)` creates the agents live in their Lyzr workspace, and report the created agent IDs. Lyzr ADK is a hosted platform — a conversion to it is incomplete until the agents exist. (The user may decline with "skip" to keep code only.)
-- **After translating, publish the result**: create a NEW GitHub repo named `<source-repo>-<target-framework>` (using the `GH_TOKEN`/`gh` available in the environment), push the translated code + a README there, and report the repo URL. See `translate` skill Step 8. Never print the token.
+- **After translating, publish the result**: create a NEW GitHub repo named `<source-repo>-<target-framework>` (using the `GH_TOKEN`/`gh` available in the environment), push the translated code + a README there, and report the repo URL. See `translate` skill Step 8. For a **SuperFlow source** (no source repo), name it `superflow-<flow_name>-<target-framework>`. Never print the token.
 
 ## Must Never
 - Hardcode, echo, log, or commit a user's Lyzr API key — read it from the `LYZR_API_KEY` env var for the run only

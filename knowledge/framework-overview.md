@@ -16,6 +16,7 @@ Use these signals to auto-detect the source framework:
 | **Phidata** (legacy Agno) | `from phi.agent import Agent` | `from phi.model.*`, `from phi.tools.*`, `Playground` | `*.py` with `agent.print_response()` |
 | **Google ADK** | `from google.adk.agents import Agent` | `SequentialAgent`, `ParallelAgent`, `LoopAgent`, `Runner`, `sub_agents=`, `model="gemini-"` | `*.py` with `Runner(agent=...)` |
 | **Lyzr ADK** | `from lyzr import Studio` | `Studio()`, `create_agent(role=, goal=, instructions=)`, `add_tool(`, `agent.run(...).response`, `knowledge_bases=`, `session_id=`, `provider="openai/gpt-4o"` | `lyzr-adk` in deps |
+| **Lyzr SuperFlow** | JSON `flow_data` with `nodes[]` + `connections{}` (no Python imports) | node `type` prefixed `lyzr-nodes-base.`, `{{ $('Node').json }}` / `{{ $json }}` expressions, `waitForApproval`, `splitInBatches`, `connections` keyed by node **name** | workflow JSON export / `GET /workflows/{id}.flow_data` |
 
 ## Framework Paradigm Summary
 
@@ -30,6 +31,7 @@ Use these signals to auto-detect the source framework:
 | **Agno** | Declarative (agent + tools + team) | Low | Teams and workflows | Quick agent setup, model-agnostic |
 | **Google ADK** | Agent-based (LLM + workflow agents) | Medium | sub_agents with LLM delegation | Google-native agents, multi-agent orchestration |
 | **Lyzr ADK** | Declarative (studio + agent + tools) | Low | Multiple agents on one studio | Quick agents with built-in RAG, memory & guardrails |
+| **Lyzr SuperFlow** | Graph-based workflow (nodes + typed JSON edges) | Medium | Sub-agents + parallel/loop nodes, approval gates | Durable visual automations chaining agents, tools & control flow. **Source only** (translate SuperFlow → code; maps 1:1 to LangGraph) |
 
 ## Key Structural Differences
 
@@ -43,6 +45,7 @@ Use these signals to auto-detect the source framework:
 - **Lyzr ADK**: Agents are objects created via `studio.create_agent(role, goal, instructions)`. Tools are plain functions added with `add_tool()` (no decorator). RAG (`knowledge_bases`), memory (`session_id`), and guardrails (RAI) are built in. Replies read from `response.response`.
 - **Agno**: Agent objects with `model`, `instructions`, `tools`. Most similar to OpenAI SDK structure.
 - **Google ADK**: `Agent`/`LlmAgent` with `model`, `instruction`, `tools`, `sub_agents`. Workflow agents (`SequentialAgent`, `ParallelAgent`, `LoopAgent`) for deterministic orchestration without LLMs.
+- **Lyzr SuperFlow**: No "agent object" in code — an agent is a **node** in a JSON graph (`lyzr.llm` with `systemPrompt`, or `lyzr.agent` referencing a managed Lyzr agent by id). Nodes flagged *Run as sub-agent* become tools of a parent `lyzr.llm` ReAct node.
 
 ### Orchestration Model
 - **LangGraph**: Explicit graph — you define every edge. Supports cycles (loops). Most control.
@@ -53,6 +56,7 @@ Use these signals to auto-detect the source framework:
 - **Haystack**: DAG pipeline — components connected via `pipeline.connect()`. No cycles (acyclic).
 - **Agno**: Team/Workflow — agents collaborate in teams or follow workflow steps.
 - **Google ADK**: Hybrid — LLM agents delegate to sub_agents via LLM decision; workflow agents (`SequentialAgent`, `ParallelAgent`, `LoopAgent`) provide deterministic control flow.
+- **Lyzr SuperFlow**: Explicit **DAG** — every edge is declared in `connections` (keyed by node name), with `main`/`error` output slots. Control-flow nodes (`if`, `switch`, `merge`, `splitInBatches` loop, `waitForApproval`) route items. Cycles allowed (Loop). Closest to LangGraph; durable + resumable.
 
 ### Tool Registration
 - **LangGraph**: Tools are regular functions called inside nodes. Or use `ToolNode` for LLM tool-calling.
@@ -63,3 +67,4 @@ Use these signals to auto-detect the source framework:
 - **Haystack**: Tools are `@component` classes with a `run()` method. Not function-level.
 - **Agno**: Pass functions or Toolkit objects to Agent constructor.
 - **Google ADK**: Plain functions (auto-wrapped via docstring), `BaseTool` subclass, `AgentTool` (agent-as-tool), OpenAPI specs, MCP tools.
+- **Lyzr SuperFlow**: Tools are **nodes** — `httpRequest` (built-in auth schemes), `code` (JS), `lyzr.tool` (platform tool), or any downstream node flagged *Run as sub-agent* becomes a callable tool of a parent LLM.

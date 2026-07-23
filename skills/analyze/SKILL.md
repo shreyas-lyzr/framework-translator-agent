@@ -1,6 +1,6 @@
 ---
 name: analyze
-description: "Analyze and decompose AI agent source code into a Canonical Intermediate Representation (CIR). Detects the source framework automatically and extracts agents, tools, state, orchestration, and memory. Supports 9 frameworks: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, Google ADK, and Lyzr ADK. Use when the user wants to understand an agent's structure, when beginning a framework translation, or when the user says 'analyze this agent', 'what does this agent do', 'break down this code', 'show me the architecture', 'decompose this agent', or provides agent code to translate. Triggers on: analyze, understand, decompose, architecture, break down, what does this do, translate (as first step)."
+description: "Analyze and decompose AI agent source code into a Canonical Intermediate Representation (CIR). Detects the source framework automatically and extracts agents, tools, state, orchestration, and memory. Supports 9 code frameworks: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, Google ADK, and Lyzr ADK — plus Lyzr SuperFlow workflows (a JSON flow_data graph) as a source. Use when the user wants to understand an agent's structure, when beginning a framework translation, or when the user says 'analyze this agent', 'what does this agent do', 'break down this code', 'show me the architecture', 'decompose this agent', 'convert/translate this SuperFlow to LangGraph', or provides agent code or a SuperFlow flow_data JSON to translate. Triggers on: analyze, understand, decompose, architecture, break down, what does this do, translate (as first step), superflow, flow_data, workflow json."
 allowed-tools: "Read, Grep, Glob, Bash, WebSearch, Agent"
 metadata:
   version: "1.0.0"
@@ -20,6 +20,11 @@ Detection priority:
 2. **Decorators** — secondary signal (e.g., `@function_tool`, `@component`)
 3. **File patterns** — tertiary signal (e.g., `agents.yaml` + `tasks.yaml` = CrewAI)
 4. **Method calls** — fallback (e.g., `crew.kickoff()`, `pipeline.run()`)
+
+**Non-code source — Lyzr SuperFlow:** if the input is a **JSON object** (not Python) with a `flow_data` key
+or top-level `nodes[]` + `connections{}`, and node `type`s are prefixed `lyzr-nodes-base.`, it is a
+**SuperFlow workflow**. Report `Detected framework: **Lyzr SuperFlow** (confidence: high)` and load
+`references/superflow-patterns.md`.
 
 If multiple frameworks are detected (e.g., LangChain + LangGraph), identify the primary orchestration framework.
 
@@ -41,6 +46,7 @@ Read the corresponding reference file for the detected framework:
 - `references/agno-patterns.md`
 - `references/google-adk-patterns.md`
 - `references/lyzr-adk-patterns.md`
+- `references/superflow-patterns.md`  (Lyzr SuperFlow — source workflow JSON)
 
 Load **only** the detected framework's reference file.
 

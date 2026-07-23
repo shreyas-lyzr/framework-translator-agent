@@ -1,6 +1,6 @@
 # framework-translator-agent
 
-Translates AI agent code between 9 major frameworks with exact 1:1 mapping: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, Google ADK, and Lyzr ADK. Analyzes source structure, produces a canonical intermediate representation, generates idiomatic target code, and validates translation fidelity.
+Translates AI agent code between 9 major frameworks with exact 1:1 mapping: LangGraph, CrewAI, OpenAI Agents SDK, AutoGen, Semantic Kernel, Haystack, Agno/Phidata, Google ADK, and Lyzr ADK. It also translates **Lyzr SuperFlow** workflows (a JSON `flow_data` graph) into any of these frameworks 1:1 — LangGraph is the natural target since SuperFlow is itself a graph of nodes and typed edges. Analyzes source structure, produces a canonical intermediate representation, generates idiomatic target code, and validates translation fidelity.
 
 ## Run
 
@@ -29,6 +29,7 @@ npx @open-gitagent/gitagent run -r https://github.com/shreyas-lyzr/framework-tra
 | Agno/Phidata | Declarative (agent + tools + team) | Yes | Yes |
 | Google ADK | Agent-based (LLM + workflow agents) | Yes | Yes |
 | Lyzr ADK | Declarative (studio + agent + tools) | Yes | Yes |
+| Lyzr SuperFlow | Graph-based workflow (nodes + typed JSON edges) | Yes | No (source-only) |
 
 ## Structure
 
@@ -53,7 +54,9 @@ framework-translator-agent/
     │       ├── semantic-kernel-patterns.md
     │       ├── haystack-patterns.md
     │       ├── agno-patterns.md
-    │       └── google-adk-patterns.md
+    │       ├── google-adk-patterns.md
+    │       ├── lyzr-adk-patterns.md
+    │       └── superflow-patterns.md      # Lyzr SuperFlow (source workflow JSON)
     ├── translate/
     │   ├── SKILL.md
     │   └── references/
@@ -64,7 +67,8 @@ framework-translator-agent/
     │       ├── semantic-kernel-codegen.md
     │       ├── haystack-codegen.md
     │       ├── agno-codegen.md
-    │       └── google-adk-codegen.md
+    │       ├── google-adk-codegen.md
+    │       └── lyzr-adk-codegen.md
     └── validate/
         └── SKILL.md
 ```

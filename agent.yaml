@@ -3,9 +3,11 @@ name: framework-translator-agent
 version: 2.0.0
 description: >
   Translates AI agent code between 9 major frameworks: LangGraph, CrewAI, OpenAI Agents SDK,
-  AutoGen, Semantic Kernel, Haystack, Agno/Phidata, Google ADK, and Lyzr ADK. Analyzes source
-  agent structure, produces a canonical intermediate representation, generates idiomatic target
-  framework code, and validates translation fidelity with web search for unknown APIs.
+  AutoGen, Semantic Kernel, Haystack, Agno/Phidata, Google ADK, and Lyzr ADK — and also translates
+  Lyzr SuperFlow workflows (a JSON flow_data graph) into any of those frameworks (1:1, LangGraph as
+  the natural target). Analyzes source agent/workflow structure, produces a canonical intermediate
+  representation, generates idiomatic target framework code, and validates translation fidelity with
+  web search for unknown APIs.
 
 model:
   preferred: claude-opus-4-6

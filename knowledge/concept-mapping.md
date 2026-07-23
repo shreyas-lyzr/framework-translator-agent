@@ -74,3 +74,42 @@ Use these labels in the concept mapping table during translation:
 - **Adapted**: The concept exists but requires structural restructuring (e.g., a graph edge becomes a handoff)
 - **Lossy**: No direct equivalent — the closest approximation is used with a clear explanation of what is lost
 - **Unsupported**: Cannot be translated — the concept will be omitted with an explanation and a suggestion for manual implementation
+
+---
+
+## Lyzr SuperFlow (Source Workflow) → CIR
+
+SuperFlow is a **source-only** framework: the input is a `flow_data` **JSON graph**, not code. It decomposes
+into the CIR cleanly and maps **1:1 to LangGraph** (both are node+edge graphs with typed state). The full
+node catalog, expression translation, trigger/HITL/reliability handling and a worked example live in
+`skills/analyze/references/superflow-patterns.md`. Summary of how SuperFlow constructs fill the CIR:
+
+| CIR section | SuperFlow source |
+|---|---|
+| **Agent Inventory** | `lyzr.llm` (systemPrompt/model verbatim), `lyzr.agent` (managed agent id), `lyzr.taskDecomposition` (swarm) |
+| **Tool Inventory** | `httpRequest`, `code` (JS body), `lyzr.tool`, sub-agent-flagged nodes; document nodes as external tools |
+| **State Schema** | one channel **per node name** (holds that node's output items) + `input`/`trigger`; enables `{{ $('Node').json }}` refs |
+| **Orchestration Graph** | `connections` (keyed by node name) → edges; `if`/`switch` → conditional edges; `splitInBatches` → loop; `merge` → fan-in |
+| **HITL** | `waitForApproval` (message + typed form; approved=slot0 / rejected=slot1) |
+| **External Dependencies** | HTTP endpoints + auth, Lyzr document/parse/extraction services, agent/tool ids, `envs`/credentials |
+
+### SuperFlow → LangGraph quick fidelity table
+
+| SuperFlow node | LangGraph target | Fidelity |
+|---|---|---|
+| `trigger` | `START` + initial `state["input"]` (manual/webhook/schedule → see reference) | Direct |
+| `lyzr.llm` | node calling a `ChatModel` (ReAct via `create_react_agent` if looped) | Direct / Adapted |
+| `lyzr.agent` | reconstructed LLM/ReAct node **or** call the Lyzr agent API | Adapted (KB/memory = Lossy) |
+| `if` / `switch` | `add_conditional_edges(...)` | Direct |
+| `merge` / `splitInBatches` (loop) | fan-in reducer / cyclic subgraph or `Send` | Adapted |
+| `set` / `sort` / `limit` / `filter` / `renameKeys` | node with a Python transform | Direct |
+| `httpRequest` | `httpx`/`requests` node (SigV4/OAuth2/mTLS = Adapted) | Direct |
+| `code` (JS) | node re-expressing the logic in Python | Adapted / Lossy |
+| `executeWorkflow` | compiled sub-graph as a node | Direct |
+| `waitForApproval` | `interrupt(...)` (LG v2.0) / `interrupt_before` | Direct |
+| `lyzr.parse` / `lyzr.extraction` / `lyzr.label` / `lyzr.guardrails` | doc/LLM/guardrail node or Lyzr API call | Adapted / Lossy |
+| durable exactly-once, timed `wait` | checkpointer (resume) / `time.sleep` | Lossy — flag with `# TRANSLATION NOTE:` |
+
+Non-LangGraph targets **adapt** the graph: CrewAI **Flows** (`@start`/`@listen`/`@router`), Haystack
+`Pipeline.connect()`, OpenAI Agents SDK handoffs, Google ADK `SequentialAgent`/`ParallelAgent`/`LoopAgent`.
+LangGraph is the recommended default target for SuperFlow because the graph structure is preserved exactly.
