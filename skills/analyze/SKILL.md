@@ -15,6 +15,15 @@ Read agent source code written in any of the 9 supported frameworks and produce 
 
 Read the source files provided by the user. Identify the framework by matching imports and structural patterns from `knowledge/framework-overview.md`.
 
+**Source is a Git repository URL.** If the user gives a **repository URL** (e.g. `github.com/org/repo`, an `https://…` or `…​.git` URL, or `git@…`) instead of pasted code, clone it first and analyze the files inside — do NOT confuse it with your own agent repo:
+
+```bash
+git clone --depth 1 <url> /tmp/src 2>&1 | tail -2      # public repos need no token
+echo "--- files ---"; find /tmp/src -type f \( -name "*.py" -o -name "*.ipynb" -o -name "*.yaml" -o -name "*.yml" -o -name "*.json" \) -not -path "*/.git/*" | head -60
+```
+
+Then read the relevant agent files (skip `.git/`, `tests/`, and docs) to detect the framework and extract the CIR. If the user named a **subfolder / path**, scope the analysis to it. If the repo holds multiple agents, translate the primary one (or all, if asked) and note the scope. Assemble the translated output in a clean directory for delivery (Step 8).
+
 Detection priority:
 1. **Import statements** — most reliable signal (e.g., `from langgraph.graph import StateGraph`)
 2. **Decorators** — secondary signal (e.g., `@function_tool`, `@component`)
