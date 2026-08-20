@@ -35,6 +35,16 @@ or top-level `nodes[]` + `connections{}`, and node `type`s are prefixed `lyzr-no
 **SuperFlow workflow**. Report `Detected framework: **Lyzr SuperFlow** (confidence: high)` and load
 `references/superflow-patterns.md`.
 
+**Non-code source — Lyzr Studio / ADK agent config:** if the input is a **JSON object** with `agent_role` +
+`agent_instructions` (usually also `agent_goal`, `provider_id`/`model`, `response_format`, `features`), it is
+a **Lyzr Studio hosted agent** config. Report `Detected framework: **Lyzr ADK** (confidence: high)`, load
+`references/lyzr-adk-patterns.md`, and map the config into the CIR:
+- `agent_instructions` → the agent's **system prompt** (quote verbatim); `agent_role`/`agent_goal` → role/goal.
+- `provider_id` + `model` (e.g. `OpenAI` / `gpt-4.1`), `temperature`, `top_p` → model + generation config.
+- `response_format.json_schema` → **structured output** (recreate with the target's structured-output mechanism).
+- `features[].type == "MEMORY"` `max_messages_context_count` → **conversation memory** window (N messages).
+- `tool` / `tool_configs` / `managed_agents` → tools / sub-agents; `max_iterations` → agent-loop cap.
+
 If multiple frameworks are detected (e.g., LangChain + LangGraph), identify the primary orchestration framework.
 
 If uncertain, use **WebSearch** to verify: search for the ambiguous import or pattern to confirm which framework it belongs to.
