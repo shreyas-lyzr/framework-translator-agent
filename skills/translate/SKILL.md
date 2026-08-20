@@ -241,9 +241,28 @@ Run this step **only when the target framework is Lyzr ADK.** For every other ta
    - `AuthenticationError` → the key is missing/invalid/expired — ask for a fresh one
    - `APIError` / `ValidationError` → bad `provider`/model id, quota, or a malformed field — show the message and the offending value
 
-## Step 8: Publish the translated code to a NEW GitHub repo
+## Step 8: Deliver the translated code
 
-After the code is generated (and, for a Lyzr ADK target, after Step 7), publish the translation to a **fresh GitHub repo** so the user gets a shareable result. A GitHub token is in the environment (`GH_TOKEN` / `GITHUB_TOKEN`); `gh` and `git` are installed and `gh` reads `GH_TOKEN` automatically. Do this by default; report the URL at the end.
+Deliver the finished translation. Pick the mode from the request:
+
+- **Zip / archive mode** — when the instructions ask for a **zip, archive, or download**, or say **do not publish / no GitHub**. Package the code and emit it as a base64 archive block (below). Do NOT create a GitHub repo.
+- **Publish mode (default)** — otherwise, publish to a fresh GitHub repo.
+
+### Zip / archive mode
+
+1. **Assemble the output in a clean directory** (as in publish mode: the generated file(s) + a short `README.md`).
+2. **Zip it and emit it as one base64 block** so the caller can download it — run exactly:
+   ```bash
+   cd <output-dir>
+   python3 -c "import shutil; shutil.make_archive('/tmp/translated','zip','.')"
+   printf '[[ZIPFILE:translated.zip:'; base64 /tmp/translated.zip | tr -d '\n'; printf ']]\n'
+   ```
+   Emit the `[[ZIPFILE:translated.zip:<base64>]]` block **verbatim** in the tool output — do not summarize, wrap, or omit it (it is how the caller downloads the archive).
+3. Then tell the user the archive is ready (name + rough size). **Do not create a GitHub repo in this mode.**
+
+### Publish mode (default)
+
+After the code is generated (and, for a Lyzr ADK target, after Step 7), publish the translation to a **fresh GitHub repo** so the user gets a shareable result. A GitHub token is in the environment (`GH_TOKEN` / `GITHUB_TOKEN`); `gh` and `git` are installed and `gh` reads `GH_TOKEN` automatically. Report the URL at the end.
 
 1. **Assemble the output in a clean directory** (NOT the cloned source repo — start empty so the new repo contains only the translation): the generated file(s) + a short `README.md` stating *source framework → target framework*, the original source URL, the `pip install …` line, and how to run.
 2. **Name the repo** `<source-repo-name>-<target-framework>`, lowercased with every non-alphanumeric run collapsed to `-` (e.g. source `write_a_book_with_flows` + target Lyzr ADK ⇒ `write-a-book-with-flows-lyzr-adk`). If the name already exists, append `-2`, `-3`, …
